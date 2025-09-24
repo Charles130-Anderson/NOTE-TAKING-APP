@@ -1,0 +1,40 @@
+# -----------------
+# Backend ignores
+# -----------------
+.env
+backend/.venv/
+__pycache__/
+
+# -----------------
+# Frontend ignores
+# -----------------
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Node & build
+node_modules/
+frontend/node_modules/
+dist/
+frontend/dist/
+dist-ssr
+*.local
+
+# -----------------
+# Editor / system
+# -----------------
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+Thumbs.db
