@@ -9,6 +9,41 @@ export default function NoteCard({ note, onEdit, onDelete }) {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState(null);
 
+  const buttonStyle = {
+    backgroundColor: "#d9b99b",
+    color: "#5b4636",
+    border: "1px solid #c9a77a",
+    borderRadius: 4,
+    padding: "6px 12px",
+    cursor: "pointer",
+    fontFamily: "Arial, sans-serif",
+    textDecoration: "none",
+  };
+
+  const selectStyle = {
+    ...buttonStyle,
+    appearance: "none",
+    padding: "6px 10px",
+  };
+
+  const inputStyle = {
+    ...buttonStyle,
+    padding: "6px 10px",
+    border: "1px solid #c9a77a",
+    borderRadius: 4,
+    fontFamily: "Arial, sans-serif",
+    outline: "none",
+    flex: 1, // make input grow to fit available space
+  };
+
+  const handleHover = (e) => {
+    e.target.style.backgroundColor = "#c9a77a";
+  };
+
+  const handleLeave = (e) => {
+    e.target.style.backgroundColor = "#d9b99b";
+  };
+
   const handleShare = async () => {
     if (!shareTo) {
       alert("Please enter an email address");
@@ -43,38 +78,82 @@ export default function NoteCard({ note, onEdit, onDelete }) {
   };
 
   return (
-    <div style={{ border: "1px solid #ddd", padding: 12, borderRadius: 8, marginBottom: 10 }}>
+    <div
+      style={{
+        border: "1px solid #ddd",
+        padding: 12,
+        borderRadius: 8,
+        marginBottom: 10,
+        backgroundColor: "#f5e9d3",
+        color: "#5b4636",
+        boxShadow: "2px 2px 5px rgba(0,0,0,0.1)",
+      }}
+    >
       <h3>{note.title}</h3>
       <p style={{ whiteSpace: "pre-wrap" }}>{note.content}</p>
 
       <div style={{ display: "flex", gap: 8 }}>
-        <button onClick={() => onEdit(note)}>Edit</button>
-        <button onClick={() => onDelete(note)}>Delete</button>
+        <button
+          style={buttonStyle}
+          onMouseEnter={handleHover}
+          onMouseLeave={handleLeave}
+          onClick={() => onEdit(note)}
+        >
+          Edit
+        </button>
+        <button
+          style={buttonStyle}
+          onMouseEnter={handleHover}
+          onMouseLeave={handleLeave}
+          onClick={() => onDelete(note)}
+        >
+          Delete
+        </button>
       </div>
 
       {/* Share controls */}
-      <div style={{ marginTop: 8 }}>
+      <div style={{ marginTop: 8, display: "flex", gap: 6, alignItems: "center" }}>
         <input
           placeholder="Share with email"
           value={shareTo}
           onChange={(e) => setShareTo(e.target.value)}
-          style={{ marginRight: 6 }}
+          style={inputStyle}
         />
-        <select value={permission} onChange={(e) => setPermission(e.target.value)}>
+        <select
+          value={permission}
+          onChange={(e) => setPermission(e.target.value)}
+          style={selectStyle}
+          onMouseEnter={handleHover}
+          onMouseLeave={handleLeave}
+        >
           <option value="viewer">Viewer</option>
           <option value="editor">Editor</option>
         </select>
-        <button onClick={handleShare} disabled={loading}>
+        <button
+          style={buttonStyle}
+          onMouseEnter={handleHover}
+          onMouseLeave={handleLeave}
+          onClick={handleShare}
+          disabled={loading}
+        >
           {loading ? "Sending..." : "Share"}
         </button>
-        {status && <p>{status}</p>}
       </div>
 
       {/* Manage Sharing */}
       <div style={{ marginTop: 8 }}>
-        <button onClick={() => setManageOpen(!manageOpen)}>Manage Sharing</button>
+        <button
+          style={buttonStyle}
+          onMouseEnter={handleHover}
+          onMouseLeave={handleLeave}
+          onClick={() => setManageOpen(!manageOpen)}
+        >
+          Manage Sharing
+        </button>
         {manageOpen && <ManageSharing noteId={note.id} />}
       </div>
+
+      {status && <p>{status}</p>}
     </div>
   );
 }

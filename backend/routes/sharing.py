@@ -92,7 +92,7 @@ def list_permissions(
         raise HTTPException(status_code=403, detail="Not allowed")
 
     stmt = (
-        select(User.email.lebel("email"), SharedNote.permission.label("permission"))
+        select(User.email.label("email"), SharedNote.permission.label("permission"))
         .join(User, User.id == SharedNote.shared_with_user_id)
         .where(SharedNote.note_id == note.id)
     )
