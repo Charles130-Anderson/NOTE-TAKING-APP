@@ -3,7 +3,7 @@
 
 import uuid
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import and_, or_, select
+from sqlalchemy import and_, select
 from sqlalchemy.orm import Session
 
 from utils.emails import send_email
@@ -28,8 +28,10 @@ def share_note(
 ):
     """Share a note with another user and assign permission."""
     if not payload.email:
-        raise HTTPException(status_code=400,
-                detail="Provide email to share with")
+        raise HTTPException(
+            status_code=400,
+            detail="Provide email to share with"
+        )
 
     try:
         note_uuid = uuid.UUID(note_id)
@@ -50,8 +52,10 @@ def share_note(
         select(User).where(User.email == payload.email)
     ).scalar_one_or_none()
     if not target_user:
-        raise HTTPException(status_code=404,
-                detail="User to share with not found")
+        raise HTTPException(
+            status_code=404,
+            detail="User to share with not found"
+        )
 
     if target_user.id == current_user.id:
         raise HTTPException(
@@ -63,22 +67,26 @@ def share_note(
         select(SharedNote).where(
             and_(
                 SharedNote.note_id == note.id,
-                SharedNote.shared_with_user_id == target_user.id,
+                SharedNote.shared_with_user_id == target_user.id
             )
         )
     ).scalar_one_or_none()
     if existing:
-        return {"detail": f"Already shared as {existing.permission}"}
+        return {
+            "detail": (
+                f"Already shared as {existing.permission}"
+            )
+        }
 
     share = SharedNote(
         note_id=note.id,
         shared_with_user_id=target_user.id,
-        permission=payload.permission,
+        permission=payload.permission
     )
     db.add(share)
     db.commit()
 
-    # Send email notification (async can be used if needed)
+    # Send email notification
     send_email(
         to_email=payload.email,
         subject="A note has been shared with you",
@@ -89,10 +97,10 @@ def share_note(
     )
 
     return {
-    "detail": (
-        f"Note shared with {payload.email} as {payload.permission}"
-    )
-}
+        "detail": (
+            f"Note shared with {payload.email} as {payload.permission}"
+        )
+    }
 
 
 @router.get("/notes/{note_id}/permissions")
@@ -112,8 +120,10 @@ def list_permissions(
         raise HTTPException(status_code=403, detail="Not allowed")
 
     stmt = (
-        select(User.email.label("email"),
-            SharedNote.permission.label("permission"))
+        select(
+            User.email.label("email"),
+            SharedNote.permission.label("permission")
+        )
         .join(User, User.id == SharedNote.shared_with_user_id)
         .where(SharedNote.note_id == note.id)
     )
@@ -143,7 +153,7 @@ def update_permission(
         select(SharedNote).where(
             and_(
                 SharedNote.note_id == note.id,
-                SharedNote.shared_with_user_id == uuid.UUID(user_id),
+                SharedNote.shared_with_user_id == uuid.UUID(user_id)
             )
         )
     ).scalar_one_or_none()
@@ -153,7 +163,9 @@ def update_permission(
 
     shared_entry.permission = payload.permission
     db.commit()
-    return {"detail": f"Permission updated to {payload.permission}"}
+    return {
+        "detail": f"Permission updated to {payload.permission}"
+    }
 
 
 @router.post("/send-email")
@@ -186,7 +198,7 @@ def revoke_access(
         select(SharedNote).where(
             and_(
                 SharedNote.note_id == note.id,
-                SharedNote.shared_with_user_id == uuid.UUID(user_id),
+                SharedNote.shared_with_user_id == uuid.UUID(user_id)
             )
         )
     ).scalar_one_or_none()
