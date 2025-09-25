@@ -1,5 +1,5 @@
 
-# Note-Taking App
+# Note Taking App
 
 [Note Taking App Documentation](https://docs.google.com/document/d/1WgxgrtsTGFwISTvtfSkNetjVB-Ol8XlGzf6ErFFc1QI/edit?usp=sharing)
 
