@@ -1,15 +1,19 @@
+#!/usr/bin/env python3
+"""Send emails using SendGrid API."""
+
 import os
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from dotenv import load_dotenv
 
-load_dotenv()  # so you can keep SENDGRID_API_KEY in .env
+load_dotenv()  # Load SENDGRID_API_KEY and FROM_EMAIL from .env
 
 SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
 FROM_EMAIL = os.getenv("FROM_EMAIL")
 
+
 def send_email(to_email: str, subject: str, content: str):
-    """Send an email using SendGrid"""
+    """Send an email using SendGrid."""
     if not SENDGRID_API_KEY:
         raise RuntimeError("SendGrid API key not configured")
 
