@@ -1,6 +1,6 @@
 
 # Note-Taking App
-
+https://docs.google.com/document/d/1WgxgrtsTGFwISTvtfSkNetjVB-Ol8XlGzf6ErFFc1QI/edit?usp=sharing
 This repository contains a full-stack **Note-Taking App** with a **React frontend** and a **FastAPI backend**. Users can create, edit, delete, and share notes. The app includes authentication, protected routes, and email sharing functionality.
 
 <img width="1073" height="651" alt="Dashboard" src="https://github.com/user-attachments/assets/a9f6dce2-bb1d-4f63-b346-389752d6a39c" />
