@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+"""Authentication utilities: password hashing and JWT handling."""
+
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 import uuid
@@ -17,27 +20,46 @@ settings = get_settings()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
 
+
 def verify_password(plain_password: str, password_hash: str) -> bool:
+    """Verify a password against its hash."""
     return pwd_context.verify(plain_password, password_hash)
 
+
 def get_password_hash(password: str) -> str:
+    """Hash a password using bcrypt."""
     return pwd_context.hash(password)
 
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
+
+def create_access_token(
+    data: dict, expires_delta: Optional[timedelta] = None
+) -> str:
+    """Create a JWT access token."""
     to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + (expires_delta or timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES))
+    expire = datetime.now(timezone.utc) + (
+        expires_delta
+        or timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    )
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
+    encoded_jwt = jwt.encode(
+        to_encode, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM
+    )
     return encoded_jwt
 
-async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> User:
+
+async def get_current_user(
+    token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
+) -> User:
+    """Retrieve the currently authenticated user from JWT."""
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
+        payload = jwt.decode(
+            token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
+        )
         user_id: str = payload.get("user_id")
         if user_id is None:
             raise credentials_exception
