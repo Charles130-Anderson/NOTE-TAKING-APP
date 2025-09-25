@@ -4,7 +4,8 @@ from uuid import UUID
 class ShareRequest(BaseModel):
     username: str | None = None
     email: EmailStr | None = None
-
+class ShareUpdate(BaseModel):
+    permission: str 
 class SharedNoteOut(BaseModel):
     id: UUID
     note_id: UUID
