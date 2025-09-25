@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+"""FastAPI routes for CRUD operations on notes."""
+
 import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
@@ -12,21 +15,46 @@ from utils.auth import get_current_user
 
 router = APIRouter(prefix="/notes")
 
+
 @router.post("", response_model=NoteOut)
-def create_note(payload: NoteCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    note = Note(title=payload.title, content=payload.content, owner_id=current_user.id)
+def create_note(
+    payload: NoteCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Create a new note for the current user."""
+    note = Note(
+        title=payload.title,
+        content=payload.content,
+        owner_id=current_user.id,
+    )
     db.add(note)
     db.commit()
     db.refresh(note)
     return note
 
+
 @router.get("", response_model=list[NoteOut])
-def list_my_notes(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    notes = db.execute(select(Note).where(Note.owner_id == current_user.id).order_by(Note.created_at.desc()))
+def list_my_notes(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """List all notes belonging to the current user."""
+    notes = db.execute(
+        select(Note)
+        .where(Note.owner_id == current_user.id)
+        .order_by(Note.created_at.desc())
+    )
     return list(notes.scalars().all())
 
+
 @router.get("/{note_id}", response_model=NoteOut)
-def get_note(note_id: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def get_note(
+    note_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Retrieve a single note by ID if authorized."""
     try:
         note_uuid = uuid.UUID(note_id)
     except Exception:
@@ -38,14 +66,26 @@ def get_note(note_id: str, db: Session = Depends(get_db), current_user: User = D
 
     if note.owner_id != current_user.id:
         shared = db.execute(
-            select(SharedNote).where(SharedNote.note_id == note.id, SharedNote.shared_with_user_id == current_user.id)
+            select(SharedNote).where(
+                SharedNote.note_id == note.id,
+                SharedNote.shared_with_user_id == current_user.id,
+            )
         ).scalar_one_or_none()
         if not shared:
-            raise HTTPException(status_code=403, detail="Not authorized to view this note")
+            raise HTTPException(
+                status_code=403, detail="Not authorized to view this note"
+            )
     return note
 
+
 @router.put("/{note_id}", response_model=NoteOut)
-def update_note(note_id: str, payload: NoteUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def update_note(
+    note_id: str,
+    payload: NoteUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Update a note if the current user is the owner."""
     try:
         note_uuid = uuid.UUID(note_id)
     except Exception:
@@ -56,7 +96,9 @@ def update_note(note_id: str, payload: NoteUpdate, db: Session = Depends(get_db)
         raise HTTPException(status_code=404, detail="Note not found")
 
     if note.owner_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Only the owner can update this note")
+        raise HTTPException(
+            status_code=403, detail="Only the owner can update this note"
+        )
 
     if payload.title is not None:
         note.title = payload.title
@@ -68,8 +110,14 @@ def update_note(note_id: str, payload: NoteUpdate, db: Session = Depends(get_db)
     db.refresh(note)
     return note
 
+
 @router.delete("/{note_id}")
-def delete_note(note_id: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def delete_note(
+    note_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Delete a note if the current user is the owner."""
     try:
         note_uuid = uuid.UUID(note_id)
     except Exception:
@@ -80,7 +128,9 @@ def delete_note(note_id: str, db: Session = Depends(get_db), current_user: User 
         raise HTTPException(status_code=404, detail="Note not found")
 
     if note.owner_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Only the owner can delete this note")
+        raise HTTPException(
+            status_code=403, detail="Only the owner can delete this note"
+        )
 
     db.delete(note)
     db.commit()
