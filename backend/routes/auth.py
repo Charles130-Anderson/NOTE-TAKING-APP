@@ -48,28 +48,32 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)):
     )
 
 
-@router.post("/login", response_model=TokenResponse)
-def login(payload: LoginRequest, db: Session = Depends(get_db)):
-    """Authenticate user and return access token."""
+@router.post("/login-form", response_model=TokenResponse)
+def login_form(
+    db: Session = Depends(get_db),
+    form_data: OAuth2PasswordRequestForm = Depends(),
+):
+    return _handle_login(form_data.username, form_data.password, db)
+
+
+@router.post("/login-json", response_model=TokenResponse)
+def login_json(
+    payload: LoginRequest,
+    db: Session = Depends(get_db),
+):
+    return _handle_login(payload.username_or_email, payload.password, db)
+
+
+def _handle_login(username_or_email: str, password: str, db: Session):
     user = db.execute(
-        select(User).where(
-            or_(
-                User.username == payload.username_or_email,
-                User.email == payload.username_or_email,
-            )
-        )
+        select(User).where(or_(User.username == username_or_email, User.email == username_or_email))
     ).scalar_one_or_none()
 
-    if not user or not verify_password(payload.password, user.password_hash):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid credentials"
-        )
+    if not user or not verify_password(password, user.password_hash):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
 
     access_token = create_access_token(
         {"user_id": str(user.id), "username": user.username},
         timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
     )
-    return TokenResponse(
-        access_token=access_token, user_id=str(user.id), username=user.username
-    )
+    return TokenResponse(access_token=access_token, user_id=str(user.id), username=user.username)
