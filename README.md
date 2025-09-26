@@ -3,6 +3,8 @@
 
 [Note Taking App Documentation](https://docs.google.com/document/d/1WgxgrtsTGFwISTvtfSkNetjVB-Ol8XlGzf6ErFFc1QI/edit?usp=sharing)
 
+[Note Taking App Walkthrough Video](https://youtu.be/khg_Lxl_igQ)
+
 [Note Taking App FastAPI Docs (Backend)](https://note-taking-app-backend-st8u.onrender.com/docs)
 
 [Note Taking App Frontend](https://note-taking-app-vg7u.onrender.com/)
