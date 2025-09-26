@@ -7,8 +7,6 @@
 
 [Note Taking App FastAPI Docs (Backend)](https://note-taking-app-backend-st8u.onrender.com/docs)
 
-[Note Taking App Frontend](https://note-taking-app-vg7u.onrender.com/)
-
 This repository contains a full-stack **Note-Taking App** with a **React frontend** and a **FastAPI backend**. Users can create, edit, delete, and share notes. The app includes authentication, protected routes, and email sharing functionality.
 
 <img width="1073" height="651" alt="Dashboard" src="https://github.com/user-attachments/assets/a9f6dce2-bb1d-4f63-b346-389752d6a39c" />
