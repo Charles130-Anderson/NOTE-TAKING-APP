@@ -12,7 +12,7 @@
         e.preventDefault();
         setErr("");
         try {
-        const { data } = await api.post("/login-json", {
+        const { data } = await api.post("/login", {
             username_or_email: usernameOrEmail,
             password,
         });
